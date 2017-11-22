@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>站点添加</title>
+</head>
+<body>
+	<script type="text/javascript">
+		var winUnitAdd = new Windows("unit_add");
+		var oUnitAdd = {
+			initForm : function(){
+ 				winUnitAdd.find("#unitForm").form({
+					url : '$!basePath/admin/unit/doAdd',
+					onSubmit : function() {
+						var pass = winUnitAdd.find('#unitForm').form("validate");
+						if (pass) {
+							winUnitAdd.find("#ok").linkbutton("loading");
+						}
+						return pass;
+					},
+					success : function(data) {
+						var result = jQuery.parseJSON(data);
+						if (result.success == true) {
+							top.Notiy.success("添加成功!");
+							winUnitAdd.setReturnValue(true);
+							winUnitAdd.close();
+						} else {
+							top.Dialog.alert("提示", result.error, "error");
+						}
+						winUnitAdd.find("#ok").linkbutton("reset");
+					}
+				});
+				winUnitAdd.find('#parentId').combotree({
+					url: '$!basePath/admin/unit/unitTree',
+					//valueField:'id',
+					//textField:'text',
+					onSelect:function (record) {
+						winUnitAdd.find('#unitForm').find('input[name=code]').val(record.code);
+					}
+				});
+
+	 		},
+//	 		typeOnChange : function(n,o){
+//	 			winUnitAdd.find('#parentId').combobox({url: '$!basePath/admin/unit/unitTree?typeId='+n+''});
+//	 		},
+	 		ok : function(){
+	 			winUnitAdd.find('#unitForm').submit();
+	 		},
+	 		cancel : function(){
+				winUnitAdd.close();
+	 		}
+		};
+		$(function() {
+			 oUnitAdd.initForm();
+		});
+
+	</script>
+	<div class="easyui-layout" data-options="fit:true">
+		<div data-options="region:'center',border:false">
+			<form id="unitForm" method="post" style="padding-top:10px;padding-left: 20px;">
+				<table width="90%" >
+					<tr>
+						<td>站点类型：</td>
+						<td><select id="type" name="unitType" class="easyui-combobox" data-options="editable:false"
+							style="width: 204px;">
+								<option value="station">站级单位</option>
+								<option value="city">市级单位</option>
+								<option value="province">省级单位</option></select></td>
+					</tr>
+					<tr>
+						<td>上级单位：</td>
+						<td><select id="parentId" name="parentId"
+							class="easyui-combotree" data-options="required:true" style="width: 204px;">
+						<!--<option selected="selected" value="0">无上级部门</option>-->
+						</select></td>
+					</tr>
+					<tr>
+						<td>站点名称：</td>
+						<td><input type="text" class="easyui-validatebox" name="name"
+							maxlength="50" data-options="required:true" style="width: 90%;" />
+						</td>
+					</tr>
+					<tr>
+						<td>联系人：</td>
+						<td><input type="text" class="easyui-validatebox" name="contactor"
+								   maxlength="50"  style="width: 90%;" />
+						</td>
+					</tr>
+					<tr>
+						<td>联系电话：</td>
+						<td><input type="text" class="easyui-validatebox" name="contactPhone"
+								   maxlength="20"  style="width: 90%;" />
+						</td>
+					</tr>
+
+					<tr id="petroCode">
+						<td>石油编码：</td>
+						<td><input type="text" class="easyui-validatebox" name="petroCode"
+								   maxlength="50" data-options="required:true" style="width: 90%;" />
+						</td>
+					</tr>
+					<tr id="bianma">
+						<td>站点编码：</td>
+						<td><input type="text" class="easyui-validatebox" id="code" name="code"
+								   maxlength="50" data-options="required:true"  readonly style="width: 90%;" />
+						</td>
+					</tr>
+					<tr>
+						<td>地址：</td>
+						<td><textarea class="easyui-textarea" rows="3" style="width: 90%;" cols="21" name="address"></textarea></td>
+					</tr>
+
+
+				</table>
+			</form>
+		</div>
+		<!--Change Button Text-->
+		<div data-options="region:'south',border:false">
+			<div class="dialog-button">
+				<a id="ok" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="oUnitAdd.ok()">确定</a>
+				<a id="cancel" class="easyui-linkbutton" data-options="iconCls:'icon-cancel'" href="javascript:void(0)" onclick="oUnitAdd.cancel()">取消</a>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

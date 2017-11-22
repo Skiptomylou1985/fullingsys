@@ -1,0 +1,317 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<link href="$!basePath/framework/css/easyui/default/easyui.css" rel="stylesheet" type="text/css"/>
+<link href="$!basePath/framework/css/easyui/icon.css" rel="stylesheet" type="text/css"/>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>index.html</title>
+    #style
+    <!-- 监听键盘事件 -->
+    <script type="text/javascript" src="$!basePath/framework/js/core/plugin/zframe.keyboard.js"></script>
+    <!--<script type="text/javascript" src="$!basePath/framework/js/core/plugin/zframe.windows.js"></script>-->
+</head>
+<body class="easyui-layout">
+<script type="text/javascript">
+    var orderDetail = new Windows("order_detail");
+    var formStatus ;
+    $(function(){
+        initDataGrid();
+        initWindows();
+        initToolbar();
+        //设置键盘监听控件参数
+        KeyBoard.GridName = "dgWorkOrderList";
+        KeyBoard.Ctrl = true;
+        KeyBoard.Shift = true;
+        KeyBoard.Init();
+    });
+    function initDataGrid(){
+        $('#dgWorkOrderList').datagrid({
+            autoRowHeight:false,
+            collapsible:true,
+            url:'$!basePath/business/workorder/list',
+            sortName:'submitDate',
+            sortOrder:'desc',
+            remoteSort: true,
+            border:false,
+            fit:true,
+            idField:'id',
+            singleSelect:true,
+            nowrap:false,
+            //view:scrollview,
+            frozenColumns:[[
+                {field:'ck',checkbox:true},
+                {title:'序号',field:'id',width:40,sortable:true}
+            ]],
+            columns:[[
+                {
+                    field: 'code', title: '工单编号', width: 200, sortable: true
+                },
+                {
+                    field: 'stationName', title: '站点', width: 120, sortable: true
+                },
+                {field:'status',title:'当前状态',width:120,formatter:function(value,row,index){
+                    if(row.status == 0){
+                        return "已报修";
+                    }else if(row.status == 1){
+                        return "已维修";
+                    }else if(row.status == 2){
+                        return "已验收";
+                    }else if(row.status == 3){
+                        return "已取消";
+                    }else if(row.status == 4){
+                        return "已驳回";
+                    }
+                }},
+                {field:'submitDate',title:'报修时间',width:150,sortable:true,formatter:function(value,row,index){
+                    if(value == "" || value==null)
+                        return "";
+                    var unixTimestamp = new Date(value);
+                    return unixTimestamp.toLocaleString();
+                }
+
+                },
+                {field:'serviceDate',title:'维修完成时间',width:150,sortable:true,formatter:function(value,row,index){
+                    if(value == "" || value==null)
+                        return "";
+                    var unixTimestamp = new Date(value);
+                    return unixTimestamp.toLocaleString();
+                }
+                },
+                {field:'confirmDate',title:'用户验收时间',width:150,sortable:true,formatter:function(value,row,index){
+                    if(value == "" || value==null)
+                            return "";
+                    var unixTimestamp = new Date(value);
+                    return unixTimestamp.toLocaleString();
+                }
+                },
+
+                {
+                    field: 'submitter', title: '报修人员', width: 120, sortable: true
+                },
+                {
+                    field: 'operator', title: '维修人员', width: 120, sortable: true
+                }
+            ]],
+            pagination:true,
+            rownumbers:true,
+            toolbar:'#dgWorkOrderList-toolbar',
+            onHeaderContextMenu: function(e,field){
+                e.preventDefault();
+                //创建表头右键菜单
+                DataGridUtil.createHeadContextMenu("dgWorkOrderList");
+                //显示表头右键菜单
+                DataGridUtil.showHeadContextMenu("dgWorkOrderList",e);
+            },
+            onRowContextMenu:function(e,rowindex,rowData){
+                rowContentMenuShowHandler(e,rowindex,rowData,"dgWorkOrderList","dgWorkOrderList_rowContextMenu");
+            },
+            onLoadSuccess : function(){
+                DataGridUtil.initDataGridColumn("dgWorkOrderList");
+            },
+            rowStyler:function(index,row){
+                /* if(row.type == 3){
+                 return 'background-color:red;color:#fff;';
+                 }else if(row.type == 2){
+                 return 'background-color:yellow;';
+                 } */
+            },
+            onDblClickRow:function(rowindex,rowdata){
+                orderDetail.windows({href:"${basePath}/business/workorder/detail?id="+rowdata.id});
+                orderDetail.windows("open");
+            },
+
+        });
+
+    }
+    function initWindows(){
+        orderDetail.windows({
+            title:"订单详情",
+            width:600,
+            height:415,
+            modal:true,
+            closed:true,
+            iconCls:'icon-user-add',
+            href:"${basePath}/business/workorder/detail",
+            onClose:function(){
+            }
+        });
+        $('#searchform').hide();
+        $("#btnHide").click(function(){
+            $('#searchform').hide();
+        });
+
+    }
+    function rowContentMenuClickHandler(item){
+        ContentMenuClickHandler("dgWorkOrderList",item);
+    }
+    function initToolbar(){
+        $("#btnQueryAll").click(function(){
+            $('#dgWorkOrderList').datagrid("load",{});
+        });
+        $("#btnToQuery").click(function(){
+            $('#searchform').show();
+        });
+        $("#btnQuery").click(function(){
+            $('#dgWorkOrderList').datagrid("load",
+                    {
+                        subDateBegin:$('#subDateBegin').datetimebox('getValue'),
+                        subDateEnd:$('#subDateEnd').datetimebox('getValue'),
+                        serviceDateBegin:$('#serviceDateBegin').datetimebox('getValue'),
+                        serviceDateEnd:$('#serviceDateEnd').datetimebox('getValue'),
+                        confirmDateBegin:$('#confirmDateBegin').datetimebox('getValue'),
+                        confirmDateEnd:$('#confirmDateEnd').datetimebox('getValue'),
+                        status:$('#status').combobox('getValue'),
+                        station:$('#station').val(),
+                        submitter:$('#submitter').val(),
+                        operator:$('#operator').val()
+                    });
+        });
+        $("#btnExportExcel").click(function(){
+            DataGridUtil.exportExcel($("#dgWorkOrderList"),"WorkOrder");
+        });
+        $("#btnDetail").click(function(){
+            var selectRows = $("#dgWorkOrderList").datagrid("getSelected");
+            if(!selectRows){
+                top.Notiy.warning("请选择要查看的工单");
+            }else{
+                orderDetail.windows({href:"${basePath}/business/workorder/detail?id="+selectRows.id});
+                orderDetail.windows("open");
+            }
+        });
+    }
+    function doSearch(v,n){
+        doDataGridSearch("dgWorkOrderList",n,v);
+    }
+    //按下Ctrl键之后的回调函数
+    function CtrlKeyEvent(eventType){
+        if(eventType == "down"){
+            $("#dgWorkOrderList").datagrid("options").singleSelect = false;
+        }else if(eventType=="up"){
+            $("#dgWorkOrderList").datagrid("options").singleSelect = true;
+        }
+    };
+    function getTime(/** timestamp=0 **/) {
+        var ts = arguments[0] || 0;
+        var t, y, m, d, h, i, s;
+        t = ts ? new Date(ts * 1000) : new Date();
+        y = t.getFullYear();
+        m = t.getMonth() + 1;
+        d = t.getDate();
+        h = t.getHours();
+        i = t.getMinutes();
+        s = t.getSeconds();
+        // 可根据需要在这里定义时间格式
+        return y + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d) + ' ' + (h < 10 ? '0' + h : h) + ':' + (i < 10 ? '0' + i : i) + ':' + (s < 10 ? '0' + s : s);
+    }
+</script>
+<div data-options="region:'center',border:true">
+    <form title="条件查询" name="searchform" method="post" action="" id ="searchform"
+          style="padding-top:25px;padding-bottom:25px;padding-left: 20px; border-collapse:separate; border-spacing:10px 20px;">
+        <tr>
+            <div>
+            <td width="70" height="30"><strong>提交时间：</strong></td>
+            <td height="30">
+                <input class="easyui-datetimebox" id="subDateBegin" name="subDateBegin" data-options="showSeconds:false"  style="width:150px">
+            </td>
+            <td width="70" height="30">~</td>
+            <td height="30">
+                <input class="easyui-datetimebox" id="subDateEnd" name="subDateEnd" data-options="showSeconds:false"  style="width:150px">
+            </td>
+            <td width="70" height="30"><strong>维修完成时间：</strong></td>
+            <td height="30">
+                <input class="easyui-datetimebox" id="serviceDateBegin" name="serviceDateBegin" data-options="showSeconds:false"  style="width:150px">
+            </td>
+            <td width="70" height="30">~</td>
+            <td height="30">
+                <input class="easyui-datetimebox" id="serviceDateEnd" name="serviceDateEnd" data-options="showSeconds:false"  style="width:150px">
+            </td>
+            </div>
+            <div>
+            <td width="70" height="30"><strong>验收时间：</strong></td>
+            <td height="30">
+                <input class="easyui-datetimebox" id="confirmDateBegin" name="confirmDateBegin" data-options="showSeconds:false"  style="width:150px">
+            </td>
+            <td width="70" height="30">~</td>
+            <td height="30">
+                <input class="easyui-datetimebox" id="confirmDateEnd" name="confirmDateEnd" data-options="showSeconds:false"  style="width:150px">
+            </td>
+            <td width="70" height="30" style="padding-left:40px"><strong>当前工单状态：</strong></td>
+            <td  height="30">
+                <select class="easyui-combobox" name="status" id="status" style="width:100px">
+                    <option value="">全部</option>
+                    <option value="0">已提交</option>
+                    <option value="1">已维修</option>
+                    <option value="2">已验收</option>
+                    <option value="3">已取消</option>
+                </select>
+            </td>
+            <td width="70" height="30" style="padding-left:40px"><strong>站点名称：</strong></td>
+            <td  height="30">
+                <input class="easyui-validatebox" id="station" name="station"  style="width: 150px;"/>
+            </td>
+            </div>
+            <td width="70" height="30" style="padding-left:40px"><strong>提交人：</strong></td>
+            <td  height="30">
+                <input class="easyui-validatebox" id="submitter" name="submitter"  style="width: 80px;"/>
+            </td>
+            <td width="70" height="30" style="padding-left:40px"><strong>维修人：</strong></td>
+            <td  height="30">
+                <input class="easyui-validatebox" id="operator" name="operator"  style="width: 80px;"/>
+            </td>
+
+        </tr>
+        <a id="btnQuery" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" >查询</a>
+        <a id="btnHide" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-log-delete',plain:true" >隐藏</a>
+    </form>
+    <table id="dgWorkOrderList"></table>
+</div>
+<!-- 工具条 -->
+<div id="dgWorkOrderList-toolbar" style="padding:2px 0;" class="datagrid-toolbar">
+    <table cellpadding="0" cellspacing="0" style="width:100%">
+        <tr>
+            <td style="padding-left:2px">
+                <a id="btnToQuery" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-res-add',plain:true" style="float: left;">条件查询</a>
+                <div class="datagrid-btn-separator"></div>
+                <a id="btnQueryAll" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-magnifier',plain:true" style="float: left;">查询全部</a>
+                <div class="datagrid-btn-separator"></div>
+                <a id="btnDetail" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-magnifier',plain:true" style="float: left;">工单详情</a>
+                <div class="datagrid-btn-separator"></div>
+                <!--<a id="btnExportExcel" href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-export-excel',plain:true" style="float: left;">数据导出</a>-->
+                <!--<div class="datagrid-btn-separator"></div>-->
+
+            </td>
+            <td style="text-align:right;padding-right:2px">
+                <label><strong>快速查询：</strong></label>
+                <input id="ss" style="width:240px;" class="easyui-searchbox" data-options="searcher:doSearch,prompt:'请输入查询内容',menu:'#ss_mm'"/>
+                <div id="ss_mm" style="width:80px;">
+                    <div data-options="name:'code'">工单编号</div>
+                    <div data-options="name:'stationName'">站点名称</div>
+                    <div data-options="name:'submitter'">报修人员</div>
+                    <div data-options="name:'operator'">维修人员</div>
+                </div>
+                <select style="padding-right:200px" class="easyui-combobox" data-options="width:150,onChange:function(newVal,oldVal){
+						if(newVal != -1){
+							    $('#dgWorkOrderList').datagrid('load',{status:newVal});
+							}else{
+							    $('#dgWorkOrderList').datagrid('load',{});
+							}
+					}">
+                    <option value="-1">选择工单状态</option>
+                    <option value="0">已报修</option>
+                    <option value="1">已维修</option>
+                    <option value="2">已验收</option>
+                    <option value="3">已取消</option>
+                    <option value="4">已驳回</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+</div>
+<!-- 右键菜单 -->
+<div id="dgWorkOrderList_rowContextMenu" data-options="onClick:rowContentMenuClickHandler" class="easyui-menu" style="width:120px;">
+    <div name="select" data-options="iconCls:'icon-ok'">选中</div>
+    <div name="detail" data-options="iconCls:'icon-log-delete'" with="btnDetail">查看详细信息</div>
+
+</div>
+</body>
+</html>

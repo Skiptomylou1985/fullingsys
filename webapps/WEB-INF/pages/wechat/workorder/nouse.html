@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+  <title>无法报修</title>
+  <link rel="stylesheet" href="$!basePath/weui/css/weui.min.css">
+  <link rel="stylesheet" href="$!basePath/weui/css/dialog.css">
+  <style>
+    html, body{
+      height: 100%;
+      background-color: #f8f8f8;
+    }
+    body{
+      font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+    }
+    .item{
+      padding: 10px 0;
+    }
+    .item__title{
+      margin-bottom: 5px;
+      padding-left: 15px;
+      padding-right: 15px;
+      color: #999;
+      font-weight: normal;
+      font-size: 14px;
+    }
+    .item__ctn{
+      padding: 0 15px;
+    }
+    .page_feedback{
+      padding: 15px;
+      overflow: auto;
+      background-color: #FFFFFF;
+    }
+
+    /*fix fastclick很难点中的bug*/
+    label > * { pointer-events: none; }
+
+    /* weui需要fix的 */
+    .weui-picker__item{
+      padding: 0;
+      height: 34px;
+      line-height: 34px;
+    }
+  </style>
+</head>
+<body ontouchstart>
+<div class="weui-content" id="content">
+  <div class="page__hd">
+    <h3 class="page__title" id="Info" style="text-align: center;color: red ">维修人员无法进行设备报修</h3>
+  </div>
+</div>
+
+</body>
+</html>

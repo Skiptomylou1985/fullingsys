@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>工单列表</title>
+    <link rel="stylesheet" href="$!basePath/weui/css/weui.min.css">
+    <link rel="stylesheet" href="$!basePath/weui/css/dialog.css">
+    <link rel="stylesheet" href="$!basePath/framework/css/easyui/default/easyui.css" type="text/css">
+    <script src="$!basePath/weui/js/zepto.min.js"></script>
+    <script src="$!basePath/weui/js/dialog.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/common/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/common/jquery-ui-1.9.0.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/core/zframe.ui.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/core/zframe.ui-lang-zh_CN.js"></script>
+</head>
+<style>
+    html, body{
+        height: 100%;
+        background-color: #f8f8f8;
+    }
+    body{
+        font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+    }
+    .item{
+        padding: 10px 0;
+    }
+    .item__title{
+        margin-bottom: 5px;
+        padding-left: 15px;
+        padding-right: 15px;
+        color: #999;
+        font-weight: normal;
+        font-size: 14px;
+    }
+    .item__ctn{
+        padding: 0 15px;
+    }
+    .page_feedback{
+        padding: 15px;
+        overflow: auto;
+        background-color: #FFFFFF;
+    }
+
+    /*fix fastclick很难点中的bug*/
+    label > * { pointer-events: none; }
+
+    /* weui需要fix的 */
+    .weui-picker__item{
+        padding: 0;
+        height: 34px;
+        line-height: 34px;
+    }
+</style>
+<body ontouchstart>
+<div class="weui-content">
+    <div class="page__hd">
+        <!--<h3 id="title" align="center" class="page__title">工单列表</h3>-->
+        <h3 align="center"  class="page__title" id="Info">姓名:$!name&nbsp&nbsp工单总数:$!count</h3>
+    </div>
+    <div class="page__bd">
+
+        <div class="weui-cells" id="orderlist">
+
+
+        </div>
+
+    </div>
+
+</div>
+<script type="text/javascript">
+    var state = '$!state';
+    var userType = '$!type';
+    var name = '$!name';
+    var orders = '$!orders';
+    var orderArr = jQuery.parseJSON('$!orders')
+    var count = '$!count'
+    initForm();
+
+    function initForm() {
+//        if("undolist" == state){
+//            $('#title').text("待处理工单列表");
+//        }
+        if("submitter" == userType){
+            $('#UserInfo').val("报修人姓名:"+name);
+        }
+        if(count > 0){
+            for(var x in orderArr){
+                addOrder(orderArr[x]);
+            }
+        }
+    }
+
+    function addOrder(workOrder) {
+        var order = document.createElement("a");
+        order.className = "weui-cell weui-cell_access";
+        order.href = "$!basePath/wechat/workorder/detail?orderCode="
+                +workOrder.code+"&userType="+userType;
+        var bd = document.createElement("div");
+        bd.className = "weui-cell__bd"
+        var pp = document.createElement("p");
+        pp.innerHTML = (workOrder.submitDate.year+1900) + "年"+ (workOrder.submitDate.month+1) + "月"+workOrder.submitDate.date+"日"
+                         + "&nbsp&nbsp&nbsp"+workOrder.stationName ;
+        bd.appendChild(pp);
+        var ft = document.createElement("div");
+        ft.className = "weui-cell__ft";
+        if(0 == workOrder.status ){
+            ft.innerHTML = "待维修";
+            order.style = "color:#FF7918";
+        }else if (1 == workOrder.status){
+            ft.innerHTML = "待验收";
+            order.style = "color:#0D56FF";
+        } else if (2 == workOrder.status){
+            ft.innerHTML = "已完成";
+        } else if (3 == workOrder.status){
+            ft.innerHTML = "已取消";
+            order.style = "color:#54c3ff";
+        }else if (4 == workOrder.status){
+            ft.innerHTML = "已驳回";
+            order.style = "color:#E915FF";
+        }
+        order.appendChild(bd);
+        order.appendChild(ft);
+        var list = document.getElementById("orderlist");
+        list.appendChild(order);
+    }
+
+</script>
+
+</body>
+</html>

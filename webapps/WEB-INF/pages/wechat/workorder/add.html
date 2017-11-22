@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>故障报修</title>
+    <link rel="stylesheet" href="$!basePath/weui/css/weui.min.css">
+    <link rel="stylesheet" href="$!basePath/framework/css/easyui/default/easyui.css" type="text/css">
+    <script src="$!basePath/weui/js/zepto.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/common/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/common/jquery-ui-1.9.0.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/core/zframe.ui.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/core/zframe.ui-lang-zh_CN.js"></script>
+    <style>
+        html, body{
+            height: 100%;
+            background-color: #f8f8f8;
+        }
+        body{
+            font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+        }
+        .item{
+            padding: 10px 0;
+        }
+        .item__title{
+            margin-bottom: 5px;
+            padding-left: 15px;
+            padding-right: 15px;
+            color: #999;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .item__ctn{
+            padding: 0 15px;
+        }
+        .page_feedback{
+            padding: 15px;
+            overflow: auto;
+            background-color: #FFFFFF;
+        }
+
+        /*fix fastclick很难点中的bug*/
+        label > * { pointer-events: none; }
+
+        /* weui需要fix的 */
+        .weui-picker__item{
+            padding: 0;
+            height: 34px;
+            line-height: 34px;
+        }
+    </style>
+</head>
+<body ontouchstart>
+<p id="bear"></p>
+<div class="weui-content">
+
+    <div class="page__hd">
+        <h3 align="center"  style="color: #00ee00" class="page__title" id="Info">提交成功</h3>
+    </div>
+    <form id="workOrderForm" method="POST">
+        <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">站点编号</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input"  id="petroCode" name="petroCode" type="text" required  maxlength="20" placeholder="输入石油系统唯一站点编号" emptyTips="请输入站点编号" notMatchTips="请输入正确的站点编号">
+                </div>
+                <div class="weui-cell__ft">
+                    <i class="weui-icon-warn"></i>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">站点名称</label></div>
+                <div class="weui-cell__bd"><input class="weui-input" id="stationName" name="stationName" type="text" readonly required  emptyTips="请输入正确的站点编号"></div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">联系人</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" name="submitter" type="text" required  maxlength="11"  placeholder="输入联系人" emptyTips="请输入联系人" notMatchTips="请输入正确的联系人">
+                </div>
+            </div>
+
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">联系电话</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" name="cellPhone" type="tel" required pattern="^[0-9]+$" maxlength="12" placeholder="输入联系电话" emptyTips="请输入联系电话" notMatchTips="请输入正确的联系电话">
+                </div>
+                <div class="weui-cell__ft">
+                    <i class="weui-icon-warn"></i>
+                </div>
+            </div>
+            <div class="weui-cell weui-cell_select weui-cell_select-after">
+                <div class="weui-cell__hd">
+                    <label for="faulttype"  class="weui-label">故障类型</label>
+                </div>
+                <div class="weui-cell__bd">
+                    <select class="weui-select" id="faulttype" name="faultType">
+                        <option value="1">设备故障</option>
+                        <option value="2">网络故障</option>
+                        <option value="3">软件故障</option>
+                        <option value="0">其他故障</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">故障详情</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" name="content" type="text" required  emptyTips="请输入故障详情" notMatchTips="请输入故障详情">
+                </div>
+            </div>
+
+
+        </div>
+        <div class="weui-btn-area">
+            <a id="formSubmitBtn" href="javascript:" type="submit"  class="weui-btn weui-btn_primary">提交</a>
+            <!--<a id="formCancelBtn" href="javascript:" class="weui-btn weui-btn_primary">取消</a>-->
+        </div>
+    </form>
+</div>
+</div>
+<script type="text/javascript">
+
+    $('#Info').hide();
+    var regexp = {
+        regexp: {
+            IDNUM: /(?:^\d{15}$)|(?:^\d{18}$)|^\d{17}[\dXx]$/,
+            VCODE: /^.{4}$/
+        }
+    };
+    var type = '$!type';
+    var unitList = '$!units';
+    var unitsJson = jQuery.parseJSON(unitList);
+
+    var loading;
+    $("#petroCode").on('input propertychange',function () {
+        var station = document.getElementById('stationName');
+        station.value = "";
+        for(var i=0;i<unitsJson.length;i++){
+            var tempCode = $('#petroCode').val();
+            if(unitsJson[i].petroCode == tempCode){
+                station.value = unitsJson[i].stationName;
+                return;
+            }
+        }
+
+    });
+    $('#formSubmitBtn').on('click', function () {
+        weui.form.validate('#workOrderForm', function (error) {
+            console.log(error);
+            if (!error) {
+                loading = weui.loading('提交中...');
+                $('#workOrderForm').submit();
+//                setTimeout(function () {
+//                    loading.hide();
+//                    weui.toast('操作超时', 3000);
+//                }, 10000);
+            }
+        }, regexp);
+//        loading = weui.loading('提交中...');
+//        $('#workOrderForm').submit();
+//        setTimeout(function () {
+//            loading.hide();
+//            weui.toast('操作超时', 3000);
+//        }, 10000);
+    });
+$('#workOrderForm').form({
+    url:'$!basePath/wechat/workorder/doAdd?openId=$!submitterOpenId',
+    success:function(data){
+        var ret = jQuery.parseJSON(data);
+        if(ret.result){
+            loading.hide();
+            weui.toast('提交成功', 2000);
+            $('#Info').show();
+            $('#formSubmitBtn').hide();
+            this.disable();
+        }else{
+            loading.hide();
+            if(ret.content == 'orderRepeat')
+                weui.toast('提交失败,站点存在未完成的报修任务!', 3000);
+            else
+                weui.toast('提交失败!', 3000);
+        }
+    },
+    error:function () {
+        loading.hide();
+        weui.toast('提交失败,请稍后重试', 3000);
+    }
+});
+
+
+</script>
+
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+<script src="$!basePath/weui/js/weui.min.js"></script>
+
+</body>
+</html>

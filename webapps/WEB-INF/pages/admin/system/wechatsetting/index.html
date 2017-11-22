@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>index.html</title>
+	#style
+</head>
+ <body class="easyui-layout">
+ <script type="text/javascript">
+	 var winQR = new Windows("winQR");
+	 winQR.windows({
+		 title:"二维码",
+		 width:450,
+		 height:350,
+		 modal:true,
+		 closed:true,
+		 iconCls:'icon-user-add',
+		 href:"https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=TICKET"
+	 });
+//	 $('#createQR').click(function(){
+//		 	alert("in");
+//			$.ajax({
+//				url:"$!basePath/admin/wechatsetting/getQRTicket",
+//				type:"POST",
+//				async:false,
+//				data:{
+//					type:$('#type').combobox('getValue'),
+//					time:$('#time').val()
+//				},
+//
+//				dataType:'json',
+//				success:function(data){
+//					if(data.result == "success"){
+//						//var url = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+data.ticket;
+//						winEdit.windows({href:"https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+data.ticket});
+//						winEdit.windows("open");
+//					}
+//				}
+//			});
+//
+//	 });
+	 function getQR() {
+		 //alert("in");
+		 $.ajax({
+			 url:"$!basePath/admin/wechatsetting/getQRTicket",
+			 type:"POST",
+			 async:false,
+			 data:{
+				 type:$('#type').combobox('getValue'),
+				 time:$('#time').val()
+			 },
+
+			 dataType:'json',
+			 success:function(data){
+				 if(data.result == "success"){
+					 window.open("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+data.ticket);
+					 //var url = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+data.ticket;
+//					 winEdit.windows({href:"https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket="+data.ticket});
+//					 winEdit.windows("open");
+				 }
+			 }
+		 });
+	 }
+
+ </script>
+    <div data-options="region:'center',border:false">
+    	<form id="qrForm" action="" method="post">
+    		<div class="easyui-panels">
+			    <div title="二维码" data-options="iconCls:'icon-email'" style="padding:10px;">
+			    		<table >
+			    			<tr>
+			    				<td style="padding-left:20px;">二维码类型:</td>
+			    				<td><select class="easyui-combobox" id="type" data-options="width:'180'">
+									<option value="userTempQR">注册业务员(临时二维码)</option>
+									<option value="userFixQR">注册业务员(永久二维码)</option>
+			    					<option value="subTempQR">注册报修人员(临时二维码)</option>
+			    					<option value="subFixQR">注册报修人员(永久二维码)</option>
+			    				</select></td>
+			    			</tr>
+			    			<tr>
+			    				<td style="padding-left:20px;" >有效时长(分钟):</td>
+			    				<td><input type="text" class="easyui-validatebox" id="time" name="time" style="width:40px;"/></td>
+								<td><a id="createQR" class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="getQR()">生成二维码</a></td>
+			    			</tr>
+			    		</table>
+			    		<hr style="border: solid 1px #d4d4d4;"/>
+			    </div>   
+
+			</div>
+    	</form>
+    </div>
+  </body>
+</html>

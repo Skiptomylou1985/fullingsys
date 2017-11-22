@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>工单详情</title>
+</head>
+  <body>
+  <script type="text/javascript">
+
+	</script>
+    <div class="easyui-layout" data-options="fit:true">
+			<div data-options="region:'center',border:false">
+				<form id="userForm" method="post" style="font-size: 14px ;padding-top:10px;padding-left:20px;">
+					<table style="width: auto">
+						<tr>
+							<td>工单编号：</td>
+							<td>
+								<label >$!order.code</label>
+							</td>
+						</tr>
+						<tr>
+							<td>站点名称：</td>
+							<td>
+								<label>$!order.stationName</label>
+							</td>
+						</tr>
+						<tr>
+							<td>工单状态：</td>
+							<td>
+								<label id="status" style="color: green"></label>
+							</td>
+						</tr>
+						<tr>
+							<td>报修时间：</td>
+							<td>
+								<label>$!order.submitDate</label>
+							</td>
+						</tr>
+						<tr>
+							<td>报修人员：</td>
+							<td>
+								<label>$!order.submitter &nbsp&nbsp&nbsp 联系电话：$!order.cellPhone</label>
+							</td>
+						</tr>
+						<tr>
+							<td>维修人员：</td>
+							<td>
+								<label>$!order.operator &nbsp&nbsp&nbsp 联系电话：$!order.operatorPhone</label>
+							</td>
+						</tr>
+						<tr>
+							<td>维修时间：</td>
+							<td>
+								<label>$!order.serviceDate</label>
+							</td>
+						</tr>
+						<tr>
+							<td>验收时间：</td>
+							<td>
+								<label>$!order.confirmDate</label>
+							</td>
+						</tr>
+						<tr>
+							<td>验收评分：</td>
+							<td>
+								<label>$!order.score</label>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td>故障详情：</td>
+							<td width="250" style="word-break:break-all">
+								<label>$!order.content</label>
+							</td>
+						</tr>
+						<tr valign="top">
+							<td>维修记录：</td>
+							<td width="250" style="word-break:break-all">
+								<label >$!order.log</label>
+							</td>
+						</tr>
+					</table>
+					<!--<hr style="border: solid 1px #d4d4d4;"/>-->
+					<div>
+						<table id="workLogs">
+
+						</table>
+					</div>
+				</form>
+			</div>
+	</div>
+  <script type="text/javascript">
+	  var status = $!order.status;
+	  var statusLabel = $('#status');
+	  if(0==status){
+		  statusLabel.text("已报修");
+	  }else if(1 == status){
+		  statusLabel.text("已维修未验收");
+	  }else if(2 == status){
+		  statusLabel.text("已验收");
+	  }else if(3 == status){
+		  statusLabel.text("已取消");
+	  }else if(4 == status){
+		  statusLabel.text("已驳回");
+	  }
+  </script>
+  </body>
+</html>

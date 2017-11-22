@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <title>工单详情</title>
+    <link rel="stylesheet" href="$!basePath/weui/css/weui.min.css">
+    <link rel="stylesheet" href="$!basePath/weui/css/dialog.css">
+    <link rel="stylesheet" href="$!basePath/framework/css/easyui/default/easyui.css" type="text/css">
+    <script src="$!basePath/weui/js/zepto.min.js"></script>
+    <script src="$!basePath/weui/js/dialog.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/common/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/common/jquery-ui-1.9.0.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/core/zframe.ui.min.js"></script>
+    <script type="text/javascript" src="$!basePath/framework/js/core/zframe.ui-lang-zh_CN.js"></script>
+    <style>
+        html, body{
+            height: 100%;
+            background-color: #f8f8f8;
+        }
+        body{
+            font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif;
+        }
+        .item{
+            padding: 10px 0;
+        }
+        .item__title{
+            margin-bottom: 5px;
+            padding-left: 15px;
+            padding-right: 15px;
+            color: #999;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .item__ctn{
+            padding: 0 15px;
+        }
+        .page_feedback{
+            padding: 15px;
+            overflow: auto;
+            background-color: #FFFFFF;
+        }
+
+        /*fix fastclick很难点中的bug*/
+        label > * { pointer-events: none; }
+
+        /* weui需要fix的 */
+        .weui-picker__item{
+            padding: 0;
+            height: 34px;
+            line-height: 34px;
+        }
+    </style>
+</head>
+<body ontouchstart>
+<div class="weui-content" id="info">
+    <form id="workOrderForm" method="POST">
+        <div class="weui-cell" >
+            <div class="weui-cell__hd"><label class="weui-label">工单编号:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" style="width: auto">$!order.code</label></div>
+        </div>
+        <div class="weui-cell" >
+            <div class="weui-cell__hd"><label class="weui-label">站点名称:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label">$!order.stationName</label></div>
+        </div>
+        <div class="weui-cell" >
+            <div class="weui-cell__hd"><label class="weui-label">当前状态:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" id="status" STYLE="color: #42b22e"></label></div>
+        </div>
+        <div class="weui-cell" id="submitterCell">
+            <div class="weui-cell__hd"><label class="weui-label">报修人员:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label">$!order.submitter</label></div>
+        </div>
+        <div class="weui-cell" id="cellPhoneCell">
+            <div class="weui-cell__hd"><label class="weui-label">报修电话:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label">$!order.cellPhone</label></div>
+        </div>
+        <div class="weui-cell" id="submitDateCell">
+            <div class="weui-cell__hd"><label class="weui-label">报修时间:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label"  style="width: auto">$!order.submitDate</label></div>
+        </div>
+
+        <div class="weui-cell" id="operatorCell">
+            <div class="weui-cell__hd"><label class="weui-label">维修人员:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label">$!order.operator</label></div>
+        </div>
+        <div class="weui-cell" id="operatorPhoneCell">
+            <div class="weui-cell__hd"><label class="weui-label">维修电话:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label">$!order.operatorPhone</label></div>
+        </div>
+        <div class="weui-cell" id="serviceDateCell">
+            <div class="weui-cell__hd"><label class="weui-label">维修时间:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label"  style="width: auto">$!order.serviceDate</label></div>
+        </div>
+        <div class="weui-cell"  id="confirmDateCell">
+            <div class="weui-cell__hd"><label class="weui-label">验收时间:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label"  style="width: auto">$!order.confirmDate</label></div>
+        </div>
+        <div class="weui-cell" id="scoreCell">
+            <div class="weui-cell__hd"><label class="weui-label">服务评分:</label></div>
+            <div class="weui-cell__bd">
+                <select class="weui-select" id="score" name="score" style="color: #42b22e" >
+                    <option value="10">10</option>
+                    <option value="9">9</option>
+                    <option value="8">8</option>
+                    <option value="7">7</option>
+                    <option value="6">6</option>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                    <option value="0">0</option>
+                </select>
+            </div>
+        </div>
+        <div class="weui-cell"  id="contentCell">
+            <div class="weui-cell__hd"><label class="weui-label">故障详情:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label"  style="width: auto">$!order.content</label></div>
+        </div>
+        <div class="weui-cell" id="logCellLabel">
+            <div class="weui-cell__hd"><label class="weui-label">维修记录:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label"  style="width: auto">$!order.log</label></div>
+        </div>
+        <div class="weui-cell" id="logCell">
+            <div class="weui-cell__hd"><label class="weui-label">维修记录</label></div>
+            <div class="weui-cell__bd">
+                <!--<textarea class="weui-textarea" id="log" name="log" rows="3"  required ></textarea>-->
+                <input class="weui-input" type="text" id="log" name="log" style="width: auto "   >
+            </div>
+            <!--<div class="weui-cell__bd">-->
+                <!--<input class="weui-input" name="log" type="text" rows="3" required  emptyTips="请输入维修记录" >-->
+            <!--</div>-->
+        </div>
+        </form>
+</div>
+
+<script type="text/javascript">
+
+    var u = navigator.userAgent;
+    initForm();
+    function initForm() {
+        $('#log').val('$!order.log');
+        $('#score').attr('disabled',true);
+        $('#logCell').hide();
+//        $('#log').attr('disabled',true);
+        if('0' == '$!order.status'){
+            $('#status').text('已报修');
+            $('#scoreCell').hide();
+
+        }else if('1' == '$!order.status'){
+            $('#status').text('已维修待验收');
+            if('user' == '$!userType'){
+                $('#scoreCell').hide();
+            }else if('submitter' == '$!userType'){
+                $('#score').removeAttr('disabled');
+            }
+        }else if('2' == '$!order.status'){
+            $('#status').text ('已完成验收');
+            $('#score').val('$!order.score');
+        }else if('3' == '$!order.status'){
+            $('#status').text ('已取消');
+            $('#scoreCell').hide();
+        }else if('4' == '$!order.status'){
+            $('#status').text ('已驳回');
+            $('#scoreCell').hide();
+            $('#logCellLabel').hide();
+        }
+        if('user' == '$!userType'){
+            initUserBtns();
+            if('4' == '$!order.status' || '0' == '$!order.status'){
+                $('#logCell').show();
+                $('#logCellLabel').hide();
+            }
+        }else if('submitter' == '$!userType'){
+            initSubmitterBtns();
+
+        }
+    }
+    function initUserBtns() {
+        if('0'=='$!order.status' || '4'=='$!order.status'){
+            addCompleteBtn();
+        }
+
+    }
+    function initSubmitterBtns() {
+        if('0'=='$!order.status' || '4'=='$!order.status'){
+            addPushBtn();
+            addCancelBtn();
+        }else if('1' == '$!order.status'){
+            addConfirmBtn();
+            addRejectBtn();
+        }
+    }
+
+    function showInfo(content,time) {
+
+        if (u.indexOf('Android') > -1 || u.indexOf('Linux') > -1) {
+
+        } else if (u.indexOf('iPhone') > -1) {
+            weui.toast(content, time);
+        }else {
+
+        }
+    }
+
+    function addCompleteBtn() {
+        var btn = document.createElement("a");
+        btn.href = 'javascript:';
+        btn.type = 'submit';
+        btn.className = "weui-btn weui-btn_primary";
+        btn.text = '维修完成';
+        btn.id = 'complete';
+        var info = document.getElementById('info');
+        info.appendChild(btn);
+        $('#complete').click(function () {
+            if($('#log').val() == ''){
+                alert('请填写维修记录!');
+                return;
+            }
+            lnv.confirm({
+                title: '维修确认',
+                content: '确认已完成所有维修工作?',
+                confirmBtnText: '确定',
+                confirmHandler: function(){
+                    $('#workOrderForm').submit();
+//                            $.ajax({
+//                                type: 'POST',
+//                                asyn:false,
+//                                url: '$!basePath/wechat/workorder/complete?orderCode=$!order.code&log='+$('#log').val(),
+//                                success: function(data){
+//                                    var result = jQuery.parseJSON(data);
+//                                    if(result.result){
+//                                        alert("提交成功");
+//                                        location.href = updateUrl(window.location.href);
+//                                    }else{
+//                                        weui.toast('提交失败!'+result.content, 3000);
+//                                    }
+//                                },
+//                                error:function () {
+//                                    weui.toast('提交失败!', 3000);
+//                                }
+//                            });
+
+
+                },
+                cancelBtnText: '取消',
+                cancelHandler: function(){
+                }
+            });
+        });
+
+    }
+    $('#workOrderForm').form({
+        url:'$!basePath/wechat/workorder/complete?orderCode=$!order.code',
+        success:function(data){
+            var ret = jQuery.parseJSON(data);
+            if(ret.result){
+                alert("提交成功");
+                location.href = updateUrl(window.location.href);
+            }else{
+                if(ret.context == 'orderRepeat')
+                    alert('提交失败,站点存在未完成的报修任务!');
+                else
+                    alert('提交失败!');
+            }
+        },
+        error:function () {
+            alert("提交失败!");
+            // weui.toast('提交失败!', 3000);
+        }
+    });
+    function addCancelBtn() {
+        var btn = document.createElement("a");
+        btn.href = 'javascript:';
+        btn.type = 'submit';
+        btn.className = "weui-btn weui-btn_warn";
+        btn.text = '取消工单';
+        btn.id = 'cancel';
+        var info = document.getElementById('info');
+        info.appendChild(btn);
+        $('#cancel').click(function () {
+            lnv.confirm({
+                title: '工单取消',
+                content: '确认取消报修工单?',
+                confirmBtnText: '确定',
+                confirmHandler: function(){
+                    $.ajax({
+                        type: 'POST',
+                        asyn:false,
+                        url: '$!basePath/wechat/workorder/cancel?orderCode=$!order.code',
+                        success: function(data){
+                            var result = jQuery.parseJSON(data);
+                            if(result.result){
+                                alert("提交成功");
+                                location.href = updateUrl(window.location.href);
+                               // weui.toast('提交成功!', 3000);
+                            }else{
+                                alert("提交失败");
+                                //weui.toast('提交失败!'+result.content, 3000);
+                            }
+                        },
+                        error:function () {
+                            alert("提交失败");
+                            //weui.toast('提交失败!', 3000);
+                        }
+                    });
+
+                },
+                cancelBtnText: '取消',
+                cancelHandler: function(){
+
+                }
+            });
+        });
+    }
+    function addPushBtn() {
+        var btn = document.createElement("a");
+        btn.href = 'javascript:';
+        btn.type = 'submit';
+        btn.className = "weui-btn weui-btn_primary";
+        btn.text = '加急催单';
+        btn.id = 'push';
+        var info = document.getElementById('info');
+        info.appendChild(btn);
+        $('#push').click(function () {
+            $.ajax({
+                type: 'POST',
+                asyn:false,
+                url: '$!basePath/wechat/workorder/push?orderCode=$!order.code',
+                success: function(data){
+                    var result = jQuery.parseJSON(data);
+                    if(result.result){
+                        alert("提交成功");
+                       // self.location.reload();
+                        //weui.toast('提交成功!', 3000);
+                    }else{
+                        alert("提交失败!"+result.content);
+                        //weui.toast('提交失败!'+result.content, 3000);
+                    }
+                },
+                error:function () {
+                    alert("提交失败!");
+                    //weui.toast('提交失败!', 3000);
+                }
+            });
+        });
+    }
+    function addConfirmBtn() {
+        var btn = document.createElement("a");
+        btn.href = 'javascript:';
+        btn.type = 'submit';
+        btn.className = "weui-btn weui-btn_primary";
+        btn.text = '验收通过';
+        btn.id = 'confirm';
+        var info = document.getElementById('info');
+        info.appendChild(btn);
+        $('#confirm').click(function () {
+            lnv.confirm({
+                title: '工单验收',
+                content: '确认验收维修工单,维修人员服务分: '+$('#score').val() +" 分?",
+                confirmBtnText: '确定',
+                confirmHandler: function(){
+                    $.ajax({
+                        type: 'POST',
+                        asyn:false,
+                        url: '$!basePath/wechat/workorder/confirm?orderCode=$!order.code&score='+$('#score').val(),
+                        success: function(data){
+                            var result = jQuery.parseJSON(data);
+                            if(result.result){
+                                alert("提交成功");
+                                location.href = updateUrl(window.location.href);
+                                //window.location.reload();
+                            }else{
+                                alert("提交失败!"+result.content);
+                                //weui.toast('提交失败!'+result.content, 3000);
+                            }
+                        },
+                        error:function () {
+                            alert("提交失败!");
+                            // weui.toast('提交失败!', 3000);
+                        }
+                    });
+
+                },
+                cancelBtnText: '取消',
+                cancelHandler: function(){
+
+                }
+            });
+        });
+    }
+    function addRejectBtn() {
+        var btn = document.createElement("a");
+        btn.href = 'javascript:';
+        btn.type = 'submit';
+        btn.className = "weui-btn weui-btn_warn";
+        btn.text = '验收驳回';
+        btn.id = 'reject';
+        var info = document.getElementById('info');
+        info.appendChild(btn);
+        $('#reject').click(function () {
+            lnv.confirm({
+                title: '验收驳回',
+                content: '确认所提交的故障并未完全解决,通知维修人员再次维修?',
+                confirmBtnText: '确定',
+                confirmHandler: function(){
+                    $.ajax({
+                        type: 'POST',
+                        asyn:false,
+                        url: '$!basePath/wechat/workorder/reject?orderCode=$!order.code',
+                        success: function(data){
+                            var result = jQuery.parseJSON(data);
+                            if(result.result){
+                                alert("提交成功");
+                                location.href = updateUrl(window.location.href);
+                            }else{
+                                alert("提交失败!"+result.content);
+                                //weui.toast('提交失败!'+result.content, 3000);
+                            }
+                        },
+                        error:function () {
+                            alert("提交失败!");
+                           // weui.toast('提交失败!', 3000);
+                        }
+                    });
+
+                },
+                cancelBtnText: '取消',
+                cancelHandler: function(){
+
+                }
+            });
+        });
+    }
+    function updateUrl(url,key){
+        var key= (key || 't') +'=';  //默认是"t"
+        var reg=new RegExp(key+'\\d+');  //正则：t=1472286066028
+        var timestamp=+new Date();
+        if(url.indexOf(key)>-1){ //有时间戳，直接更新
+            return url.replace(reg,key+timestamp);
+        }else{  //没有时间戳，加上时间戳
+            if(url.indexOf('\?')>-1){
+                var urlArr=url.split('\?');
+                if(urlArr[1]){
+                    return urlArr[0]+'?'+key+timestamp+'&'+urlArr[1];
+                }else{
+                    return urlArr[0]+'?'+key+timestamp;
+                }
+            }else{
+                if(url.indexOf('#')>-1){
+                    return url.split('#')[0]+'?'+key+timestamp+location.hash;
+                }else{
+                    return url+'?'+key+timestamp;
+                }
+            }
+        }
+    }
+
+
+</script>
+<script src="$!basePath/weui/js/weui.min.js"></script>
+</body>
+</html>
