@@ -45,6 +45,10 @@ public class URLInterceptor implements HandlerInterceptor {
 		//System.out.println("new request "+requestUrl);
 		List<String> execUrl = new ArrayList<String>();
 		//访问控制例外的连接
+		execUrl.add("/business/worktrade/add");
+		execUrl.add("/business/worktrade/list");
+		execUrl.add("/business/worktrade/update");
+
 		execUrl.add("/admin/login");
 		execUrl.add("/admin/index");
 		execUrl.add("/admin/error");
@@ -108,6 +112,13 @@ public class URLInterceptor implements HandlerInterceptor {
 				}
 			}
 		}
+
+		if(requestUrl.startsWith("/business")){
+			if(ifInExecRes(execUrl,requestUrl)){
+				return true;
+			}
+		}
+
 		return true;
 	}
 	/**
