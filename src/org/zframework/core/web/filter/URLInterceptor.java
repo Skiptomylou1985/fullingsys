@@ -45,9 +45,8 @@ public class URLInterceptor implements HandlerInterceptor {
 		//System.out.println("new request "+requestUrl);
 		List<String> execUrl = new ArrayList<String>();
 		//访问控制例外的连接
-		execUrl.add("/business/worktrade/add");
-		execUrl.add("/business/worktrade/list");
-		execUrl.add("/business/worktrade/update");
+		execUrl.add("/business/worktrade");
+		execUrl.add("/business/oilstation");
 
 		execUrl.add("/admin/login");
 		execUrl.add("/admin/index");

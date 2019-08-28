@@ -1,11 +1,14 @@
 package org.zframework.web.entity.business;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Table(name = "bus_paylog")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PayLog implements Serializable {
 
 	@Id
@@ -42,6 +45,8 @@ public class PayLog implements Serializable {
 	// 修改时间
 	@Column(name = "update_time")
 	private Date updateTime;
+
+	private Integer upload;
 
 	public Integer getId() {
 		return id;
@@ -121,6 +126,22 @@ public class PayLog implements Serializable {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public Integer getLog_id() {
+		return log_id;
+	}
+
+	public void setLog_id(Integer log_id) {
+		this.log_id = log_id;
+	}
+
+	public Integer getUpload() {
+		return upload;
+	}
+
+	public void setUpload(Integer upload) {
+		this.upload = upload;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package org.zframework.web.entity.business;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -7,6 +9,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bus_orderlog")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderLog implements Serializable {
 
 	@Id
@@ -36,7 +39,7 @@ public class OrderLog implements Serializable {
 	private double price;
 	// 支付时间
 	@Column(name = "paytime")
-	private double payTime;
+	private String payTime;
 	// 营业日期
 	@Column(name = "settledate")
 	private String settleDate;
@@ -45,7 +48,7 @@ public class OrderLog implements Serializable {
 	private Integer nozzleNo;
 	// 提枪泵码
 	@Column(name = "startread")
-	private double starTread;
+	private double startRead;
 	// 挂枪泵码
 	@Column(name = "endread")
 	private double endRead;
@@ -76,6 +79,8 @@ public class OrderLog implements Serializable {
 	// 修改时间
 	@Column(name = "update_time")
 	private Date updateTime;
+
+	private int upload;
 
 	public Integer getLog_id() {
 		return log_id;
@@ -141,11 +146,11 @@ public class OrderLog implements Serializable {
 		this.price = price;
 	}
 
-	public double getPayTime() {
+	public String getPayTime() {
 		return payTime;
 	}
 
-	public void setPayTime(double payTime) {
+	public void setPayTime(String payTime) {
 		this.payTime = payTime;
 	}
 
@@ -172,12 +177,12 @@ public class OrderLog implements Serializable {
 		this.nozzleNo = nozzleNo;
 	}
 
-	public double getStarTread() {
-		return starTread;
+	public double getStartRead() {
+		return startRead;
 	}
 
-	public void setStarTread(double starTread) {
-		this.starTread = starTread;
+	public void setStartRead(double startRead) {
+		this.startRead = startRead;
 	}
 
 	public double getEndRead() {
@@ -260,6 +265,14 @@ public class OrderLog implements Serializable {
 		this.updateTime = updateTime;
 	}
 
+	public int getUpload() {
+		return upload;
+	}
+
+	public void setUpload(int upload) {
+		this.upload = upload;
+	}
+
 	@Override
 	public String toString() {
 		return "OrderLog{" +
@@ -274,7 +287,7 @@ public class OrderLog implements Serializable {
 				", payTime=" + payTime +
 				", settleDate='" + settleDate + '\'' +
 				", nozzleNo=" + nozzleNo +
-				", starTread=" + starTread +
+				", starTread=" + startRead +
 				", endRead=" + endRead +
 				", billNo=" + billNo +
 				", billItemId=" + billItemId +

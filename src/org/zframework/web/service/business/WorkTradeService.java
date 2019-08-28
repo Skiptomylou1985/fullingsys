@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import org.zframework.core.util.ObjectUtil;
 import org.zframework.orm.dao.BaseHibernateDao;
 import org.zframework.orm.query.PageBean;
-import org.zframework.web.entity.business.CarLog;
-import org.zframework.web.entity.business.OrderLog;
-import org.zframework.web.entity.business.PayLog;
-import org.zframework.web.entity.business.TradeLog;
+import org.zframework.web.entity.business.*;
 import org.zframework.web.service.BaseService;
 
 import java.util.List;
@@ -49,6 +46,16 @@ public class WorkTradeService extends BaseService<T> {
 
 	public int updateTradeLogById(TradeLog tradeLog){
 		baseDao.update(tradeLog);
+		return 1;
+	}
+
+	public int addCarRecordLog(CarRecordLog carLog){
+		baseDao.save(carLog);
+		return 1;
+	}
+
+	public int addStationHeartbeatLog(HeartbeatLog heartbeatLog){
+		baseDao.save(heartbeatLog);
 		return 1;
 	}
 }

@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.zframework.core.util.ObjectUtil;
 import org.zframework.core.web.support.WebResult;
 import org.zframework.orm.query.PageBean;
-import org.zframework.web.entity.business.CarLog;
-import org.zframework.web.entity.business.OrderLog;
-import org.zframework.web.entity.business.PayLog;
-import org.zframework.web.entity.business.TradeLog;
+import org.zframework.web.entity.business.*;
 import org.zframework.web.service.business.WorkTradeService;
 
 import java.text.ParseException;
@@ -94,6 +91,24 @@ public class WorkTradeLogController {
 		orderLog.setUpdateTime(new Date());
 		worktradeservice.addOrderLog(orderLog);
 		LOGGER.info("addOrderLog -->> success -->> " + orderLog.toString());
+		return WebResult.success();
+	}
+
+	@RequestMapping(value="/add/heartbeat", method=RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> addHeartbeatLog(@RequestBody HeartbeatLog heartbeatLog) throws ParseException {
+
+		worktradeservice.addStationHeartbeatLog(heartbeatLog);
+		LOGGER.info("addHeartbeatLog -->> success -->> " + heartbeatLog.toString());
+		return WebResult.success();
+	}
+
+	@RequestMapping(value="/add/carrecord", method=RequestMethod.POST)
+	@ResponseBody
+	public Map<String,Object> addCarRecordLog(@RequestBody CarRecordLog carRecordLog) throws ParseException {
+
+		worktradeservice.addCarRecordLog(carRecordLog);
+		LOGGER.info("addCarRecordLog -->> success -->> " + carRecordLog.toString());
 		return WebResult.success();
 	}
 

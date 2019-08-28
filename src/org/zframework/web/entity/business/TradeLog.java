@@ -1,5 +1,7 @@
 package org.zframework.web.entity.business;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -7,6 +9,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "bus_tradelog")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TradeLog implements Serializable {
 
 	@Id
@@ -80,6 +83,8 @@ public class TradeLog implements Serializable {
 	// 修改时间
 	@Column(name = "update_time")
 	private Date updateTime;
+
+	private int upload;
 
 	public int getLog_id() {
 		return log_id;
@@ -294,6 +299,14 @@ public class TradeLog implements Serializable {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public int getUpload() {
+		return upload;
+	}
+
+	public void setUpload(int upload) {
+		this.upload = upload;
 	}
 
 	@Override
